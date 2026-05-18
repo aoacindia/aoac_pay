@@ -8,9 +8,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "B2B Payment",
-  description: "Secure B2B order payment portal",
+  title: "AOAC payments",
+  description: "Secure AOAC order payment portal",
   robots: { index: false, follow: false },
+};
+
+export const viewport = {
+  themeColor: "#168e2d",
 };
 
 export default function RootLayout({

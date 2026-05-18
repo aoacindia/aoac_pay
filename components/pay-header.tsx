@@ -1,22 +1,26 @@
 import Image from "next/image";
 
-export function PayHeader() {
+type PayHeaderProps = {
+  subtitle?: string;
+};
+
+export function PayHeader({ subtitle = "Complete your order" }: PayHeaderProps) {
   return (
     <header className="mb-8 flex flex-col items-center text-center">
       <Image
         src="/logo/logo.png"
-        alt="Allahabad Organic Agricultural Company"
-        width={180}
-        height={72}
+        alt="AOAC"
+        width={100}
+        height={40}
         priority
-        className="h-auto w-44 object-contain sm:w-48"
+        className="h-auto w-20 object-contain"
       />
-      <p className="mt-4 text-xs font-medium uppercase tracking-widest text-slate-500">
-        Secure payment
-      </p>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-        Complete your order
+      <h1 className="mt-4 text-xl font-semibold tracking-tight text-[#168e2d]">
+        AOAC payments
       </h1>
+      {subtitle ? (
+        <p className="mt-1 text-sm text-[#4a9f5c]">{subtitle}</p>
+      ) : null}
     </header>
   );
 }

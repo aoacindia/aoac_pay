@@ -15,11 +15,11 @@ type OrderSummaryProps = {
 export function OrderSummary({ view }: OrderSummaryProps) {
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+      <section className="rounded-2xl border border-[#168e2d]/15 bg-white p-6 shadow-sm">
+        <p className="text-xs font-medium uppercase tracking-wider text-[#4a9f5c]">
           Order
         </p>
-        <h1 className="mt-1 font-mono text-lg font-semibold text-slate-900">
+        <h1 className="mt-1 font-mono text-lg font-semibold text-[#1a3d22]">
           {view.order.id}
         </h1>
         {view.order.invoiceNumber ? (
@@ -43,8 +43,8 @@ export function OrderSummary({ view }: OrderSummaryProps) {
         </p>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-semibold text-slate-900">Bill To</h2>
+      <section className="rounded-2xl border border-[#168e2d]/15 bg-white p-6 shadow-sm">
+        <h2 className="text-sm font-semibold text-[#168e2d]">Bill To</h2>
         <dl className="mt-4 space-y-2 text-sm">
           <DetailRow label="Customer" value={view.customer.name} />
           {view.customer.businessName ? (
@@ -58,7 +58,7 @@ export function OrderSummary({ view }: OrderSummaryProps) {
         </dl>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-2xl border border-[#168e2d]/15 bg-white shadow-sm">
         <TableHeader />
         <div className="divide-y divide-slate-100">
           {view.items.map((item) => (
@@ -67,7 +67,7 @@ export function OrderSummary({ view }: OrderSummaryProps) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+      <section className="rounded-2xl border border-[#168e2d]/15 bg-[#e8f5eb]/50 p-6">
         <dl className="space-y-3 text-sm">
           <AmountRow
             label="Items subtotal"

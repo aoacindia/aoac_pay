@@ -163,13 +163,13 @@ export function PayButton({ token, pendingAmount, disabled }: PayButtonProps) {
           type="button"
           onClick={handlePay}
           disabled={disabled || loading || !scriptReady}
-          className="w-full rounded-xl bg-slate-900 px-6 py-4 text-center text-sm font-semibold text-white shadow-lg transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-xl bg-[#168e2d] px-6 py-4 text-center text-sm font-semibold text-white shadow-lg transition hover:bg-[#127025] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Processing…" : `Pay ${formattedPending} with UPI`}
         </button>
 
         {message ? (
-          <p className="text-center text-sm text-emerald-600">{message}</p>
+          <p className="text-center text-sm text-[#168e2d]">{message}</p>
         ) : null}
         {error ? (
           <p className="text-center text-sm text-red-600">{error}</p>

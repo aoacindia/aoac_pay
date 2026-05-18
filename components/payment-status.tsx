@@ -5,8 +5,8 @@ type PaymentStatusProps = {
 
 export function PaymentStatus({ variant, message }: PaymentStatusProps) {
   const styles = {
-    paid: "border-amber-200 bg-amber-50 text-amber-900",
-    invalid: "border-slate-200 bg-slate-50 text-slate-700",
+    paid: "border-[#168e2d]/30 bg-[#e8f5eb] text-[#127025]",
+    invalid: "border-[#168e2d]/20 bg-white text-[#2d5a36]",
     error: "border-red-200 bg-red-50 text-red-800",
   };
 

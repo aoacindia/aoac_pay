@@ -17,7 +17,11 @@ export type OrderPaymentView = {
     totalAmount: number;
     paidAmount: number;
     pendingAmount: number;
+    itemsSubtotal: number;
+    deliveryCharges: number;
+    discountAmount: number;
     orderDate: Date;
+    invoiceNumber: string | null;
     invoiceType: string | null;
   };
   customer: {
@@ -52,7 +56,9 @@ export async function getOrderPaymentView(
       totalAmount: orders.totalAmount,
       paidAmount: orders.paidAmount,
       discountAmount: orders.discountAmount,
+      shippingAmount: orders.shippingAmount,
       orderDate: orders.orderDate,
+      invoiceNumber: orders.invoiceNumber,
       invoiceType: orders.invoiceType,
       orderBy: orders.orderBy,
     })
@@ -114,6 +120,22 @@ export async function getOrderPaymentView(
   const canPay =
     PAYABLE_ORDER_STATUSES.includes(orderRow.status) && pendingAmount > 0;
 
+  const items = itemsRows.map((row) => ({
+    id: row.id,
+    productName: productNameById.get(row.productId) ?? "Product",
+    quantity: row.quantity,
+    price: row.price,
+    discount: row.discount,
+    tax: row.tax,
+    lineTotal: calculateLineTotal({
+      price: row.price,
+      quantity: row.quantity,
+      discount: row.discount,
+    }),
+  }));
+
+  const itemsSubtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
+
   return {
     order: {
       id: orderRow.id,
@@ -121,7 +143,11 @@ export async function getOrderPaymentView(
       totalAmount: orderRow.totalAmount,
       paidAmount,
       pendingAmount,
+      itemsSubtotal: Math.round(itemsSubtotal * 100) / 100,
+      deliveryCharges: orderRow.shippingAmount ?? 0,
+      discountAmount: orderRow.discountAmount ?? 0,
       orderDate: orderRow.orderDate,
+      invoiceNumber: orderRow.invoiceNumber,
       invoiceType: orderRow.invoiceType,
     },
     customer: {
@@ -132,19 +158,7 @@ export async function getOrderPaymentView(
       email: customer.email,
       phone: customer.phone,
     },
-    items: itemsRows.map((row) => ({
-      id: row.id,
-      productName: productNameById.get(row.productId) ?? "Product",
-      quantity: row.quantity,
-      price: row.price,
-      discount: row.discount,
-      tax: row.tax,
-      lineTotal: calculateLineTotal({
-        price: row.price,
-        quantity: row.quantity,
-        discount: row.discount,
-      }),
-    })),
+    items,
     canPay,
   };
 }

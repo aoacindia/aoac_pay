@@ -21,10 +21,40 @@ interface RazorpayOptions {
   description: string;
   order_id: string;
   prefill: { name: string; email: string; contact: string };
+  notes: { orderId: string; userId: string };
+  config: {
+    display: {
+      blocks: {
+        upi: {
+          name: string;
+          instruments: Array<{ method: string }>;
+        };
+      };
+      sequence: string[];
+      preferences: {
+        show_default_blocks: boolean;
+      };
+    };
+  };
   handler: (response: RazorpaySuccessResponse) => void;
   modal: { ondismiss: () => void };
   theme: { color: string };
 }
+
+const UPI_ONLY_CHECKOUT_CONFIG: RazorpayOptions["config"] = {
+  display: {
+    blocks: {
+      upi: {
+        name: "Pay via UPI",
+        instruments: [{ method: "upi" }],
+      },
+    },
+    sequence: ["block.upi"],
+    preferences: {
+      show_default_blocks: false,
+    },
+  },
+};
 
 interface RazorpaySuccessResponse {
   razorpay_payment_id: string;
@@ -68,7 +98,7 @@ export function PayButton({ token, pendingAmount, disabled }: PayButtonProps) {
         key: result.keyId,
         amount: result.amount,
         currency: result.currency,
-        name: "B2B Payment",
+        name: "Allahabad Organic Agricultural Company",
         description: `Order ${result.orderId}`,
         order_id: result.razorpayOrderId,
         prefill: {
@@ -76,7 +106,12 @@ export function PayButton({ token, pendingAmount, disabled }: PayButtonProps) {
           email: result.customerEmail,
           contact: result.customerPhone,
         },
-        theme: { color: "#0f172a" },
+        notes: {
+          orderId: result.orderId,
+          userId: result.userId,
+        },
+        config: UPI_ONLY_CHECKOUT_CONFIG,
+        theme: { color: "#168e2d" },
         modal: {
           ondismiss: () => setLoading(false),
         },
@@ -130,7 +165,7 @@ export function PayButton({ token, pendingAmount, disabled }: PayButtonProps) {
           disabled={disabled || loading || !scriptReady}
           className="w-full rounded-xl bg-slate-900 px-6 py-4 text-center text-sm font-semibold text-white shadow-lg transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "Processing…" : `Pay ${formattedPending}`}
+          {loading ? "Processing…" : `Pay ${formattedPending} with UPI`}
         </button>
 
         {message ? (

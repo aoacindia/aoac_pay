@@ -108,6 +108,7 @@ export async function createRazorpayOrder(
       currency: "INR",
       keyId: razorpayKeyId,
       orderId: order.id,
+      userId: view.customer.id,
       customerName: view.customer.name,
       customerEmail: view.customer.email,
       customerPhone: view.customer.phone,

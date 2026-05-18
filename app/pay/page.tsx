@@ -5,6 +5,7 @@ import {
 } from "@/lib/orders/queries";
 import { OrderSummary } from "@/components/order-summary";
 import { PayButton } from "@/components/pay-button";
+import { PayHeader } from "@/components/pay-header";
 import { PaymentStatus } from "@/components/payment-status";
 
 export const dynamic = "force-dynamic";
@@ -63,23 +64,14 @@ export default async function PayPage({ searchParams }: PayPageProps) {
 
   return (
     <PageShell>
-      <header className="mb-8 text-center">
-        <p className="text-xs font-medium uppercase tracking-widest text-slate-500">
-          Secure payment
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-          Complete your order
-        </h1>
-      </header>
-
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
         <OrderSummary view={view} />
 
         <aside className="lg:sticky lg:top-8 lg:self-start">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <p className="text-sm text-slate-600">
-              Amount due is calculated securely on our servers. You will be
-              redirected to Razorpay to complete payment.
+              Amount due is calculated securely on our servers. Pay with UPI via
+              Razorpay checkout.
             </p>
             <div className="mt-6">
               <PayButton
@@ -100,7 +92,10 @@ export default async function PayPage({ searchParams }: PayPageProps) {
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-12">
-      <div className="mx-auto max-w-4xl">{children}</div>
+      <div className="mx-auto max-w-4xl">
+        <PayHeader />
+        {children}
+      </div>
     </main>
   );
 }

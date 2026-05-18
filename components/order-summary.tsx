@@ -22,6 +22,17 @@ export function OrderSummary({ view }: OrderSummaryProps) {
         <h1 className="mt-1 font-mono text-lg font-semibold text-slate-900">
           {view.order.id}
         </h1>
+        {view.order.invoiceNumber ? (
+          <p className="mt-2 text-sm text-slate-700">
+            <span className="text-slate-500">
+              {view.order.invoiceType === "PI"
+                ? "Proforma invoice"
+                : "Invoice"}
+              :{" "}
+            </span>
+            <span className="font-medium">{view.order.invoiceNumber}</span>
+          </p>
+        ) : null}
         <p className="mt-2 text-sm text-slate-600">
           Placed on{" "}
           {view.order.orderDate.toLocaleDateString("en-IN", {
@@ -58,7 +69,24 @@ export function OrderSummary({ view }: OrderSummaryProps) {
 
       <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
         <dl className="space-y-3 text-sm">
-          <AmountRow label="Total" value={formatCurrency(view.order.totalAmount)} />
+          <AmountRow
+            label="Items subtotal"
+            value={formatCurrency(view.order.itemsSubtotal)}
+          />
+          <AmountRow
+            label="Delivery charges"
+            value={formatCurrency(view.order.deliveryCharges)}
+          />
+          {view.order.discountAmount > 0 ? (
+            <AmountRow
+              label="Discount"
+              value={`-${formatCurrency(view.order.discountAmount)}`}
+            />
+          ) : null}
+          <AmountRow
+            label="Order total"
+            value={formatCurrency(view.order.totalAmount)}
+          />
           <AmountRow
             label="Paid"
             value={formatCurrency(view.order.paidAmount)}

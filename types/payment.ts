@@ -6,6 +6,7 @@ export type CreateRazorpayOrderResult =
       currency: string;
       keyId: string;
       orderId: string;
+      userId: string;
       customerName: string;
       customerEmail: string;
       customerPhone: string;

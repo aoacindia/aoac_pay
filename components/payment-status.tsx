@@ -12,9 +12,9 @@ export function PaymentStatus({ variant, message }: PaymentStatusProps) {
 
   return (
     <div
-      className={`rounded-2xl border px-6 py-8 text-center shadow-sm ${styles[variant]}`}
+      className={`rounded-xl border px-4 py-6 text-center shadow-sm sm:rounded-2xl sm:px-6 sm:py-8 ${styles[variant]}`}
     >
-      <p className="text-sm font-medium">{message}</p>
+      <p className="text-sm font-medium leading-relaxed sm:text-base">{message}</p>
     </div>
   );
 }

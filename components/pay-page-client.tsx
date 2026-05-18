@@ -150,27 +150,32 @@ export function PayPageClient({ token }: PayPageClientProps) {
 
   return (
     <PayShell>
-      <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-        <OrderSummary view={state.view} />
+      <div className="flex flex-col gap-5 sm:gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start lg:gap-8">
+        <div className="min-w-0 order-2 lg:order-1">
+          <OrderSummary view={state.view} />
+        </div>
 
-        <aside className="lg:sticky lg:top-8 lg:self-start">
-          <div className="rounded-2xl border border-[#168e2d]/20 bg-white p-6 shadow-sm">
-            <p className="text-sm text-[#2d5a36]">
+        <aside className="order-1 min-w-0 lg:order-2 lg:sticky lg:top-6 lg:self-start">
+          <div className="rounded-xl border border-[#168e2d]/20 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-5 md:p-6">
+            <p className="text-xs leading-relaxed text-[#2d5a36] sm:text-sm">
               Your amount is calculated securely on our servers. Pay with UPI via
               Razorpay checkout.
             </p>
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <PayButton
                 token={state.token}
                 pendingAmount={state.view.order.pendingAmount}
               />
             </div>
-            <p className="mt-4 text-center text-xs text-[#4a9f5c]">
+            <p className="mt-3 text-center text-[10px] text-[#4a9f5c] sm:mt-4 sm:text-xs">
               Payments secured by Razorpay
             </p>
           </div>
         </aside>
       </div>
+
+      {/* Spacer so fixed mobile bar does not cover content */}
+      <div className="h-2 lg:hidden" aria-hidden />
     </PayShell>
   );
 }

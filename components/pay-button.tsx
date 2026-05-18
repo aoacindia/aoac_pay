@@ -91,6 +91,7 @@ export function PayButton({ token, pendingAmount, disabled }: PayButtonProps) {
 
       if (!result.success) {
         setError(result.error);
+        setLoading(false);
         return;
       }
 
@@ -151,7 +152,7 @@ export function PayButton({ token, pendingAmount, disabled }: PayButtonProps) {
   }).format(pendingAmount);
 
   return (
-  <>
+    <>
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="lazyOnload"
@@ -163,16 +164,20 @@ export function PayButton({ token, pendingAmount, disabled }: PayButtonProps) {
           type="button"
           onClick={handlePay}
           disabled={disabled || loading || !scriptReady}
-          className="w-full rounded-xl bg-[#168e2d] px-6 py-4 text-center text-sm font-semibold text-white shadow-lg transition hover:bg-[#127025] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex min-h-[48px] w-full touch-manipulation items-center justify-center rounded-xl bg-[#168e2d] px-4 py-3.5 text-center text-sm font-semibold leading-snug text-white shadow-lg transition hover:bg-[#127025] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 sm:px-6 sm:py-4 sm:text-base"
         >
-          {loading ? "Processing…" : `Pay ${formattedPending} with UPI`}
+          <span className="break-words">
+            {loading ? "Processing…" : `Pay ${formattedPending} with UPI`}
+          </span>
         </button>
 
         {message ? (
-          <p className="text-center text-sm text-[#168e2d]">{message}</p>
+          <p className="text-center text-xs text-[#168e2d] sm:text-sm">{message}</p>
         ) : null}
         {error ? (
-          <p className="text-center text-sm text-red-600">{error}</p>
+          <p className="text-center text-xs leading-relaxed text-red-600 sm:text-sm">
+            {error}
+          </p>
         ) : null}
       </div>
     </>

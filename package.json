@@ -6,22 +6,45 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "npm run db:users:generate && npm run db:products:generate",
+    "db:push": "npm run db:users:push && npm run db:products:push",
+    "db:migrate": "npm run db:users:migrate && npm run db:products:migrate",
+    "db:users:generate": "drizzle-kit generate --config=drizzle.users.config.ts",
+    "db:users:migrate": "drizzle-kit migrate --config=drizzle.users.config.ts",
+    "db:users:push": "drizzle-kit push --config=drizzle.users.config.ts",
+    "db:users:studio": "drizzle-kit studio --config=drizzle.users.config.ts",
+    "db:products:generate": "drizzle-kit generate --config=drizzle.products.config.ts",
+    "db:products:migrate": "drizzle-kit migrate --config=drizzle.products.config.ts",
+    "db:products:push": "drizzle-kit push --config=drizzle.products.config.ts",
+    "db:products:studio": "drizzle-kit studio --config=drizzle.products.config.ts",
+    "token:generate": "tsx scripts/generate-payment-token.ts"
   },
   "dependencies": {
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
+    "drizzle-orm": "^0.45.2",
+    "jose": "^6.2.3",
+    "nanoid": "^5.1.11",
+    "next": "15.5.18",
+    "postgres": "^3.4.9",
+    "razorpay": "^2.9.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.18"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "15.5.18",
-    "@eslint/eslintrc": "^3"
+    "tailwindcss": "^4",
+    "tsx": "^4.22.2",
+    "typescript": "^5"
   }
 }

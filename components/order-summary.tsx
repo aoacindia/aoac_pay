@@ -1,4 +1,4 @@
-import type { OrderPaymentView } from "@/lib/orders/queries";
+import type { AddressView, OrderPaymentView } from "@/lib/orders/queries";
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("en-IN", {
@@ -6,6 +6,23 @@ function formatCurrency(amount: number) {
     currency: "INR",
     maximumFractionDigits: 2,
   }).format(amount);
+}
+
+function formatWeight(weight: number | null) {
+  if (weight == null || Number.isNaN(weight)) return null;
+  return `${weight} kg`;
+}
+
+function formatAddressLines(address: AddressView) {
+  const lines = [
+    [address.houseNo, address.line1].filter(Boolean).join(", "),
+    address.line2,
+    [address.city, address.district].filter(Boolean).join(", "),
+    [address.state, address.pincode].filter(Boolean).join(" — "),
+    address.country,
+  ].filter((line): line is string => Boolean(line && line.trim()));
+
+  return lines;
 }
 
 type OrderSummaryProps = {
@@ -16,6 +33,13 @@ const cardClass =
   "rounded-xl border border-[#168e2d]/15 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-5 md:p-6";
 
 export function OrderSummary({ view }: OrderSummaryProps) {
+  const billedAddress =
+    view.order.isBusinessOrder && !view.order.isBillToSameAsShipping
+      ? view.billingAddress
+      : view.order.isBillToSameAsShipping
+        ? (view.shippingAddress ?? view.billingAddress)
+        : view.billingAddress;
+
   return (
     <div className="space-y-4 sm:space-y-5 md:space-y-6">
       <section className={cardClass}>
@@ -47,39 +71,87 @@ export function OrderSummary({ view }: OrderSummaryProps) {
       </section>
 
       <section className={cardClass}>
-        <h2 className="text-sm font-semibold text-[#168e2d] sm:text-base">Bill To</h2>
+        <h2 className="text-sm font-semibold text-[#168e2d] sm:text-base">
+          Bill To
+        </h2>
         <dl className="mt-3 space-y-2.5 sm:mt-4 sm:space-y-2">
-          <DetailRow label="Customer" value={view.customer.name} />
-          {view.customer.businessName ? (
-            <DetailRow label="Business" value={view.customer.businessName} />
-          ) : null}
-          {view.customer.gstNumber ? (
-            <DetailRow label="GSTIN" value={view.customer.gstNumber} />
-          ) : null}
+          {view.order.isBusinessOrder && view.business ? (
+            <>
+              <DetailRow label="Business" value={view.business.businessName} />
+              {view.business.gstNumber ? (
+                <DetailRow label="GSTIN" value={view.business.gstNumber} />
+              ) : null}
+              {view.business.hasAdditionalTradeName &&
+              view.business.additionalTradeName ? (
+                <DetailRow
+                  label="Trade name"
+                  value={view.business.additionalTradeName}
+                />
+              ) : null}
+              <DetailRow label="Contact person" value={view.customer.name} />
+            </>
+          ) : (
+            <DetailRow label="Customer" value={view.customer.name} />
+          )}
           <DetailRow label="Email" value={view.customer.email} breakValue />
           <DetailRow label="Phone" value={view.customer.phone} />
+          {billedAddress ? (
+            <AddressBlock
+              label={
+                view.order.isBillToSameAsShipping
+                  ? "Address"
+                  : "Billing address"
+              }
+              address={billedAddress}
+            />
+          ) : null}
         </dl>
       </section>
+
+      {view.shippingAddress &&
+      !view.order.isBillToSameAsShipping &&
+      billedAddress !== view.shippingAddress ? (
+        <section className={cardClass}>
+          <h2 className="text-sm font-semibold text-[#168e2d] sm:text-base">
+            Ship To
+          </h2>
+          <dl className="mt-3 space-y-2.5 sm:mt-4 sm:space-y-2">
+            {view.shippingAddress.name ? (
+              <DetailRow label="Name" value={view.shippingAddress.name} />
+            ) : null}
+            {view.shippingAddress.phone ? (
+              <DetailRow label="Phone" value={view.shippingAddress.phone} />
+            ) : null}
+            <AddressBlock label="Address" address={view.shippingAddress} />
+          </dl>
+        </section>
+      ) : null}
 
       <section className="overflow-hidden rounded-xl border border-[#168e2d]/15 bg-white shadow-sm sm:rounded-2xl">
         <h2 className="border-b border-[#168e2d]/10 bg-[#e8f5eb] px-4 py-3 text-sm font-semibold text-[#168e2d] md:hidden">
           Items
         </h2>
 
-        {/* Mobile & tablet: card list */}
         <ul className="divide-y divide-[#168e2d]/10 md:hidden">
           {view.items.map((item) => (
             <li key={item.id} className="p-4">
               <p className="font-medium leading-snug text-[#1a3d22]">
                 {item.productName}
               </p>
-              <p className="mt-0.5 text-xs text-[#4a9f5c]">GST {item.tax}%</p>
+              <p className="mt-0.5 text-xs text-[#4a9f5c]">
+                GST {item.tax}%
+                {formatWeight(item.weight)
+                  ? ` · ${formatWeight(item.weight)}`
+                  : ""}
+              </p>
               <div className="mt-3 grid grid-cols-3 gap-2 text-xs sm:text-sm">
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-[#4a9f5c] sm:text-xs">
                     Qty
                   </p>
-                  <p className="mt-0.5 font-medium text-[#1a3d22]">{item.quantity}</p>
+                  <p className="mt-0.5 font-medium text-[#1a3d22]">
+                    {item.quantity}
+                  </p>
                 </div>
                 <div className="text-center">
                   <p className="text-[10px] uppercase tracking-wide text-[#4a9f5c] sm:text-xs">
@@ -102,7 +174,6 @@ export function OrderSummary({ view }: OrderSummaryProps) {
           ))}
         </ul>
 
-        {/* Desktop: table */}
         <div className="hidden md:block">
           <TableHeader />
           <div className="divide-y divide-[#168e2d]/10">
@@ -146,6 +217,30 @@ export function OrderSummary({ view }: OrderSummaryProps) {
           </div>
         </dl>
       </section>
+    </div>
+  );
+}
+
+function AddressBlock({
+  label,
+  address,
+}: {
+  label: string;
+  address: AddressView;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5 min-[400px]:flex-row min-[400px]:items-start min-[400px]:justify-between min-[400px]:gap-4">
+      <dt className="shrink-0 text-xs text-[#4a9f5c] sm:text-sm">{label}</dt>
+      <dd className="min-[400px]:text-right sm:text-sm">
+        {address.name ? (
+          <p className="font-medium text-[#1a3d22]">{address.name}</p>
+        ) : null}
+        {formatAddressLines(address).map((line) => (
+          <p key={line} className="text-[#1a3d22]">
+            {line}
+          </p>
+        ))}
+      </dd>
     </div>
   );
 }
@@ -197,8 +292,9 @@ function AmountRow({
 function TableHeader() {
   return (
     <div className="grid grid-cols-12 gap-2 border-b border-[#168e2d]/10 bg-[#e8f5eb] px-4 py-3 text-xs font-medium uppercase tracking-wide text-[#4a9f5c]">
-      <span className="col-span-6">Item</span>
-      <span className="col-span-2 text-center">Qty</span>
+      <span className="col-span-5">Item</span>
+      <span className="col-span-2 text-center">Weight</span>
+      <span className="col-span-1 text-center">Qty</span>
       <span className="col-span-2 text-right">Rate</span>
       <span className="col-span-2 text-right">Amount</span>
     </div>
@@ -212,11 +308,14 @@ function TableRow({
 }) {
   return (
     <div className="grid grid-cols-12 gap-2 px-4 py-4 text-sm">
-      <div className="col-span-6 min-w-0">
+      <div className="col-span-5 min-w-0">
         <p className="font-medium text-[#1a3d22]">{item.productName}</p>
         <p className="text-xs text-[#4a9f5c]">GST {item.tax}%</p>
       </div>
-      <p className="col-span-2 text-center text-[#2d5a36]">{item.quantity}</p>
+      <p className="col-span-2 text-center text-[#2d5a36]">
+        {formatWeight(item.weight) ?? "—"}
+      </p>
+      <p className="col-span-1 text-center text-[#2d5a36]">{item.quantity}</p>
       <p className="col-span-2 text-right tabular-nums text-[#2d5a36]">
         {formatCurrency(item.price)}
       </p>

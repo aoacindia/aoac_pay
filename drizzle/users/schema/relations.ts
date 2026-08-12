@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import { users } from "./users";
+import { businesses } from "./businesses";
 import { addresses } from "./addresses";
 import { billingAddresses } from "./billing-addresses";
 import { carts, bulkCarts } from "./cart";
@@ -11,12 +12,24 @@ import { suspensionReasons } from "./suspension-reasons";
 
 export const usersRelations = relations(users, ({ many }) => ({
   addresses: many(addresses),
-  billingAddresses: many(billingAddresses),
+  businesses: many(businesses),
   carts: many(carts),
   bulkCarts: many(bulkCarts),
   orders: many(orders),
   passwordResets: many(passwordResets),
   suspensionReasons: many(suspensionReasons),
+}));
+
+export const businessesRelations = relations(businesses, ({ one, many }) => ({
+  user: one(users, {
+    fields: [businesses.userId],
+    references: [users.id],
+  }),
+  billingAddress: one(billingAddresses, {
+    fields: [businesses.id],
+    references: [billingAddresses.businessId],
+  }),
+  orders: many(orders),
 }));
 
 export const addressesRelations = relations(addresses, ({ one, many }) => ({
@@ -30,9 +43,9 @@ export const addressesRelations = relations(addresses, ({ one, many }) => ({
 export const billingAddressesRelations = relations(
   billingAddresses,
   ({ one }) => ({
-    user: one(users, {
-      fields: [billingAddresses.userId],
-      references: [users.id],
+    business: one(businesses, {
+      fields: [billingAddresses.businessId],
+      references: [businesses.id],
     }),
   }),
 );
@@ -59,6 +72,10 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   customer: one(users, {
     fields: [orders.orderBy],
     references: [users.id],
+  }),
+  business: one(businesses, {
+    fields: [orders.businessId],
+    references: [businesses.id],
   }),
   shippingAddress: one(addresses, {
     fields: [orders.shippingAddressId],

@@ -11,6 +11,7 @@ import { orderStatusEnum } from "./enums";
 import { users } from "./users";
 import { addresses } from "./addresses";
 import { suppliers } from "./suppliers";
+import { businesses } from "./businesses";
 
 export const orders = pgTable(
   "Order",
@@ -65,10 +66,15 @@ export const orders = pgTable(
     shippingAddressId: text("shippingAddressId").references(
       () => addresses.id,
     ),
+    businessId: text("businessId").references(() => businesses.id),
+    isBillToSameAsShipping: boolean("isBillToSameAsShipping")
+      .default(true)
+      .notNull(),
   },
   (table) => [
     index("Order_orderBy_idx").on(table.orderBy),
     index("Order_status_idx").on(table.status),
     index("Order_supplierId_idx").on(table.supplierId),
+    index("Order_businessId_idx").on(table.businessId),
   ],
 );

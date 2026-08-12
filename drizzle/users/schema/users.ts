@@ -16,11 +16,6 @@ export const users = pgTable(
     suspended: boolean("suspended").default(false).notNull(),
     suspendedNumber: integer("suspended_number").default(0).notNull(),
     terminated: boolean("terminated").default(false).notNull(),
-    isBusinessAccount: boolean("isBusinessAccount").default(false),
-    businessName: text("businessName"),
-    gstNumber: text("gstNumber"),
-    hasAdditionalTradeName: boolean("hasAdditionalTradeName").default(false),
-    additionalTradeName: text("additionalTradeName"),
     phone: text("phone").notNull(),
     password: text("password"),
     createdAt: timestamp("createdAt", { precision: 3, mode: "date" })

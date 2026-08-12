@@ -1,13 +1,19 @@
-import { pgTable, text, timestamp, index, uniqueIndex } from "drizzle-orm/pg-core";
-import { users } from "./users";
+import {
+  index,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
+import { businesses } from "./businesses";
 
 export const billingAddresses = pgTable(
   "BillingAddress",
   {
     id: text("id").primaryKey(),
-    userId: text("userId")
+    businessId: text("businessId")
       .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+      .references(() => businesses.id, { onDelete: "cascade" }),
     houseNo: text("houseNo").notNull(),
     line1: text("line1").notNull(),
     line2: text("line2"),
@@ -23,7 +29,7 @@ export const billingAddresses = pgTable(
     updatedAt: timestamp("updatedAt", { precision: 3, mode: "date" }).notNull(),
   },
   (table) => [
-    uniqueIndex("BillingAddress_userId_key").on(table.userId),
-    index("BillingAddress_userId_idx").on(table.userId),
+    uniqueIndex("BillingAddress_businessId_key").on(table.businessId),
+    index("BillingAddress_businessId_idx").on(table.businessId),
   ],
 );

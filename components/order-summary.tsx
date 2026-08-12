@@ -8,9 +8,19 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-function formatWeight(weight: number | null) {
-  if (weight == null || Number.isNaN(weight)) return null;
-  return `${weight} kg`;
+function formatWeight(grams: number | null) {
+  if (grams == null || Number.isNaN(grams) || grams < 0) return null;
+
+  if (grams >= 1000) {
+    const kg = grams / 1000;
+    const formatted = Number.isInteger(kg) ? String(kg) : kg.toFixed(3).replace(/\.?0+$/, "");
+    return `${formatted} kg`;
+  }
+
+  const formatted = Number.isInteger(grams)
+    ? String(grams)
+    : grams.toFixed(2).replace(/\.?0+$/, "");
+  return `${formatted} g`;
 }
 
 function formatAddressLines(address: AddressView) {

@@ -17,5 +17,6 @@ export type OrderStatus = (typeof orderStatusEnum.enumValues)[number];
 
 export const PAYABLE_ORDER_STATUSES: OrderStatus[] = [
   "PENDING",
+  "PAYMENT_PENDING",
   "ORDER_SHIPPED_WITHOUT_PAYMENT",
 ];

@@ -5,7 +5,6 @@ import {
   PAYABLE_ORDER_STATUSES,
   type OrderStatus,
 } from "@/drizzle/users/schema";
-import { calculatePendingAmount } from "@/lib/orders/calculations";
 import { convertProformaToTaxInvoiceTx } from "@/lib/invoice/convert";
 
 export type PaymentCompletionInput = {
@@ -64,40 +63,11 @@ export async function completeOrderPayment(
       return { ok: false, reason: "Order is not payable" };
     }
 
-    const pendingBefore = calculatePendingAmount({
-      totalAmount: order.totalAmount,
-      paidAmount: order.paidAmount,
-      discountAmount: order.discountAmount,
-    });
-
-    const paidPaise = input.amountPaise;
-    const pendingPaise = Math.round(pendingBefore * 100);
-
-    if (paidPaise < pendingPaise) {
-      const amountPaidRupees = paidPaise / 100;
-      const newPaidAmount = (order.paidAmount ?? 0) + amountPaidRupees;
-
-      await tx
-        .update(orders)
-        .set({
-          paidAmount: newPaidAmount,
-          rOrderId: input.razorpayOrderId,
-          rPaymentId: input.razorpayPaymentId,
-          paymentMethod: input.paymentMethod ?? order.paymentMethod,
-          paymentVpa: input.paymentVpa ?? order.paymentVpa,
-          status: resolveStatusAfterPayment(order.status, false),
-        })
-        .where(eq(orders.id, input.orderId));
-
-      return { ok: true, alreadyProcessed: false };
-    }
-
-    if (paidPaise > pendingPaise) {
-      return { ok: false, reason: "Payment amount exceeds pending balance" };
-    }
-
-    const newPaidAmount = order.totalAmount;
-    const newStatus = resolveStatusAfterPayment(order.status, true);
+    const amountPaidRupees = Math.round(input.amountPaise) / 100;
+    const newPaidAmount =
+      Math.round(((order.paidAmount ?? 0) + amountPaidRupees) * 100) / 100;
+    const isFullyPaid = newPaidAmount >= order.totalAmount;
+    const newStatus = resolveStatusAfterPayment(order.status, isFullyPaid);
 
     await tx
       .update(orders)
